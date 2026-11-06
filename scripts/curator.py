@@ -39,8 +39,7 @@ def run_agent():
         raise ValueError("Brak GEMINI_API_KEY w secretach!")
 
     genai.configure(api_key=api_key)
-    # Używamy najnowszego stabilnego modelu gemini-3.8-flash
-    model = genai.GenerativeModel("gemini-3.8-flash")
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
     json_path = "data/links.json"
     if os.path.exists(json_path):
@@ -51,58 +50,3 @@ def run_agent():
 
     existing_urls = {link["url"] for link in existing_links}
     candidates = fetch_rss_candidates()
-    fresh_candidates = [c for c in candidates if c["link"] not in existing_urls]
-
-    if not fresh_candidates:
-        print("Brak nowych unikalnych artykułów.")
-        return
-
-    prompt = f"""
-    Jesteś kuratorem treści. Z poniższej listy kandydatów wybierz po 2 najciekawsze artykuły dla każdej z kategorii: {json.dumps(CATEGORIES, ensure_ascii=False)}.
-    
-    Kandydati:
-    {json.dumps(fresh_candidates, ensure_ascii=False)}
-
-    Zwróć odpowiedź WYŁĄCZNIE jako poprawną tablicę JSON (bez żadnego dodatkowego tekstu, wstępów czy bloków markdown typu ```json), w formacie:
-    [
-      {{
-        "title": "Tytuł po polsku",
-        "url": "Link",
-        "category": "Kategoria z listy",
-        "summary": "2-3 zdaniowy opis własnymi słowami"
-      }}
-    ]
-    """
-
-    response = model.generate_content(prompt)
-    
-    clean_text = response.text.strip()
-    if clean_text.startswith("```json"):
-        clean_text = clean_text[7:]
-    if clean_text.startswith("```"):
-        clean_text = clean_text[3:]
-    if clean_text.endswith("```"):
-        clean_text = clean_text[:-3]
-    clean_text = clean_text.strip()
-
-    try:
-        new_articles = json.loads(clean_text)
-    except json.JSONDecodeError as e:
-        print(f"Błąd parsowania JSON z odpowiedzi AI: {e}")
-        print(f"Otrzymany tekst:\n{response.text}")
-        raise e
-
-    today_str = datetime.date.today().isoformat()
-
-    for i, item in enumerate(new_articles):
-        new_entry = {
-            "id": f"{today_str}-{i+1}",
-            "title": item.get("title", "Bez tytułu"),
-            "url": item.get("url", "#"),
-            "category": item.get("category", "Technologia"),
-            "summary": item.get("summary", "Brak opisu."),
-            "date": today_str
-        }
-        existing_links.insert(0, new_entry)
-
-    with open(json_path,
