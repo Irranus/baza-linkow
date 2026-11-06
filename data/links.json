@@ -1,0 +1,34 @@
+[
+  {
+    "id": "2026-11-06-1",
+    "title": "Bezpieczeństwo w sieci: Jak dbać o prywatność",
+    "url": "https://niebezpiecznik.pl",
+    "category": "Technologia",
+    "summary": "Krótki i praktyczny poradnik o tym, jak chronić swoje dane w sieci i nie dać się oszukać.",
+    "date": "2026-11-06"
+  },
+  {
+    "id": "2026-11-06-2",
+    "title": "Odkrycia w kosmosie i nowe badania",
+    "url": "https://www.crazynauka.pl",
+    "category": "Nauka",
+    "summary": "Przegląd najnowszych doniesień ze świata astronomii i eksploracji układu słonecznego.",
+    "date": "2026-11-06"
+  },
+  {
+    "id": "2026-11-06-3",
+    "title": "Tworzenie urządzeń IoT w domu",
+    "url": "https://forbot.pl",
+    "category": "Majsterkowanie",
+    "summary": "Wprowadzenie do budowania własnych czujników i mikrokontrolerów w warsztacie domowym.",
+    "date": "2026-11-06"
+  },
+  {
+    "id": "2026-11-06-4",
+    "title": "Jak planować budżet domowy",
+    "url": "https://subiektywnieofinansach.pl",
+    "category": "Finanse",
+    "summary": "Przystępny poradnik oszczędzania i inwestowania w codziennym życiu.",
+    "date": "2026-11-06"
+  }
+]
