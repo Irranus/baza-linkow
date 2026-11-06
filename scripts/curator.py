@@ -39,7 +39,8 @@ def run_agent():
         raise ValueError("Brak GEMINI_API_KEY w secretach!")
 
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    # Używamy aktualnego modelu gemini-2.5-flash
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     json_path = "data/links.json"
     if os.path.exists(json_path):
@@ -75,7 +76,6 @@ def run_agent():
 
     response = model.generate_content(prompt)
     
-    # Bezpieczne oczyszczanie tekstu z ewentualnych znaczników markdown
     clean_text = response.text.strip()
     if clean_text.startswith("```json"):
         clean_text = clean_text[7:]
