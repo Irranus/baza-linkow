@@ -39,8 +39,8 @@ def run_agent():
         raise ValueError("Brak GEMINI_API_KEY w secretach!")
 
     genai.configure(api_key=api_key)
-    # Używamy aktualnego modelu gemini-2.5-flash
-    model = genai.GenerativeModel("gemini-2.5-flash")
+    # Używamy najnowszego stabilnego modelu gemini-3.8-flash
+    model = genai.GenerativeModel("gemini-3.8-flash")
 
     json_path = "data/links.json"
     if os.path.exists(json_path):
@@ -105,8 +105,4 @@ def run_agent():
         }
         existing_links.insert(0, new_entry)
 
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(existing_links, f, ensure_ascii=False, indent=2)
-
-if __name__ == "__main__":
-    run_agent()
+    with open(json_path,
