@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuratorska Baza Linków</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+  <div class="max-w-5xl mx-auto px-4 py-8">
+    <header class="border-b border-slate-700 pb-6 mb-8">
+      <h1 class="text-3xl font-bold text-emerald-400">Baza Linków Kuratorskich</h1>
+      <p class="text-slate-400 mt-2">Artykuły wyselekcjonowane i opisane przez Agenta AI.</p>
+    </header>
+
+    <nav class="flex flex-wrap gap-2 mb-8" id="category-nav">
+      <button onclick="showHome()" id="btn-home" class="nav-btn bg-emerald-500 text-slate-900 px-4 py-2 rounded-lg font-medium text-sm">Strona Główna</button>
+      <button onclick="showCategory('all', this)" class="nav-btn bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium text-sm border border-slate-700">Wszystkie w bazie</button>
+    </nav>
+
+    <h2 id="view-title" class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+      <span class="w-3 h-3 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+      Strona Główna (Po 1 z każdej kategorii)
+    </h2>
+
+    <div id="cards-container" class="grid gap-6 md:grid-cols-2"></div>
+  </div>
+
+  <script>
+    let allLinks = [];
+
+    async function loadData() {
+      try {
+        const res = await fetch('./data/links.json');
+        allLinks = await res.json();
+        setupCategoriesNav();
+        showHome();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderCard(link) {
+      return `
+        <article class="bg-slate-800 p-6 rounded-xl border border-slate-700 flex flex-col justify-between hover:border-slate-500 transition">
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-3">
+              <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-800/40">${link.category}</span>
+              <span class="text-xs text-slate-400">${link.date}</span>
+            </div>
+            <h3 class="text-lg font-bold text-white hover:text-emerald-300 transition">
+              <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.title} &rarr;</a>
+            </h3>
+            <p class="text-slate-300 text-sm mt-3 leading-relaxed">${link.summary}</p>
+          </div>
+        </article>
+      `;
+    }
+
+    function resetNavStyles() {
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-emerald-500', 'text-slate-900');
+        btn.classList.add('bg-slate-800', 'text-slate-100');
+      });
+    }
+
+    function setupCategoriesNav() {
+      const categories = [...new Set(allLinks.map(l => l.category))];
+      const nav = document.getElementById('category-nav');
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = "nav-btn bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium text-sm border border-slate-700";
+        btn.innerText = cat;
+        btn.onclick = (e) => showCategory(cat, e.target);
+        nav.appendChild(btn);
+      });
+    }
+
+    function showHome() {
+      resetNavStyles();
+      document.getElementById('btn-home').classList.add('bg-emerald-500', 'text-slate-900');
+      document.getElementById('view-title').innerHTML = `<span class="w-3 h-3 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Strona Główna (Najnowsze z każdej kategorii)`;
+
+      const categories = [...new Set(allLinks.map(l => l.category))];
+      const featured = [];
+      categories.forEach(cat => {
+        const latest = allLinks.find(l => l.category === cat);
+        if (latest) featured.push(latest);
+      });
+      document.getElementById('cards-container').innerHTML = featured.map(renderCard).join('');
+    }
+
+    function showCategory(cat, btnElement) {
+      resetNavStyles();
+      if (btnElement) btnElement.classList.add('bg-emerald-500', 'text-slate-900');
+
+      const container = document.getElementById('cards-container');
+      const title = document.getElementById('view-title');
+
+      if (cat === 'all') {
+        title.innerText = "Pełne Archiwum (Wszystkie wpisy)";
+        container.innerHTML = allLinks.map(renderCard).join('');
+      } else {
+        title.innerText = `Podstrona tematyczna: ${cat}`;
+        container.innerHTML = allLinks.filter(l => l.category === cat).map(renderCard).join('');
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
